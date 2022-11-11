@@ -2,6 +2,7 @@ package collection
 
 import (
 	"fmt"
+	"unsafe"
 )
 
 type LinkList[T Any] struct {
@@ -16,6 +17,10 @@ type LinkList[T Any] struct {
 
 func (m *LinkList[T]) String() string {
 	return fmt.Sprintf("%v", m.node)
+}
+
+func (m *LinkList[T]) Addr() uintptr {
+	return uintptr(unsafe.Pointer(m))
 }
 
 func NewLinkNode[T Any](node T) *LinkList[T] {
@@ -33,6 +38,8 @@ func NewLinkList[T Any](node T) *LinkList[T] {
 	ll.tail = ll
 	return ll
 }
+
+// Append 直接追加元素
 func (m *LinkList[T]) Append(n T) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
@@ -40,9 +47,10 @@ func (m *LinkList[T]) Append(n T) {
 
 	m.head.length++
 	node.head = m.head
-	node.prev = m.tail
+
 	if m.tail != nil {
 		m.tail.next = node
+		node.prev = m.tail
 	} else {
 		tmp := m.next
 		m.next = node
@@ -55,7 +63,49 @@ func (m *LinkList[T]) Append(n T) {
 	}
 }
 
-func (m *LinkList[T]) Remove(n T) (head *LinkList[T], exists bool) {
+// OrderAppend 按照元素的升序追加元素
+// 返回最新的头结点
+func (m *LinkList[T]) OrderAppend(n T) *LinkList[T] {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	node := &LinkList[T]{
+		node: n,
+		head: m,
+	}
+	m.head.length++
+	//先判断是否小于头节点
+	if Compare(n, m.node, CompareModeLess) {
+		node.next = m
+		node.length = m.length
+		node.head = node
+		node.tail = m.tail
+		m.prev = node
+		m.tail = nil
+		m.head = node
+		m.moveHead(node)
+		return node
+	}
+
+	max := m.findMaxNode(n)
+	if max == nil {
+		m.tail.next = node
+		node.prev = m.tail
+		m.tail = node
+	} else {
+		tmp := max.prev
+		node.next = max
+		max.prev = node
+		tmp.next = node
+		node.prev = tmp
+	}
+
+	return m
+}
+
+// Remove 删除元素
+// params: head 最新的头结点
+// params: deleted 是否删除成功
+func (m *LinkList[T]) Remove(n T) (head *LinkList[T], deleted bool) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	node := m.find(n)
@@ -114,6 +164,16 @@ func (m *LinkList[T]) find(node T) *LinkList[T] {
 	}
 	return nil
 }
+
+func (m *LinkList[T]) findMaxNode(val T) *LinkList[T] {
+	for n := m; n != nil; n = n.next {
+		if Compare(n.node, val, CompareModeGreater) {
+			return n
+		}
+	}
+	return nil
+}
+
 func (m *LinkList[T]) Walk(call func(list *LinkList[T])) {
 	for n := m; n != nil; n = n.next {
 		call(n)
