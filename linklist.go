@@ -6,7 +6,7 @@ import (
 )
 
 type LinkList[T Any] struct {
-	node   T
+	value  T
 	prev   *LinkList[T]
 	next   *LinkList[T]
 	head   *LinkList[T]
@@ -16,7 +16,7 @@ type LinkList[T Any] struct {
 }
 
 func (m *LinkList[T]) String() string {
-	return fmt.Sprintf("%v", m.node)
+	return fmt.Sprintf("%v", m.value)
 }
 
 func (m *LinkList[T]) Addr() uintptr {
@@ -25,13 +25,13 @@ func (m *LinkList[T]) Addr() uintptr {
 
 func NewLinkNode[T Any](node T) *LinkList[T] {
 	return &LinkList[T]{
-		node: node,
+		value: node,
 	}
 }
 
 func NewLinkList[T Any](node T) *LinkList[T] {
 	ll := &LinkList[T]{
-		node:   node,
+		value:  node,
 		length: 1,
 	}
 	ll.head = ll
@@ -40,10 +40,10 @@ func NewLinkList[T Any](node T) *LinkList[T] {
 }
 
 // Append 直接追加元素
-func (m *LinkList[T]) Append(n T) {
+func (m *LinkList[T]) Append(value T) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	node := NewLinkNode(n)
+	node := NewLinkNode(value)
 
 	m.head.length++
 	node.head = m.head
@@ -63,18 +63,18 @@ func (m *LinkList[T]) Append(n T) {
 	}
 }
 
-// OrderAppend 按照元素的升序追加元素
+// OrderedAppend 按照元素的升序追加元素
 // 返回最新的头结点
-func (m *LinkList[T]) OrderAppend(n T) *LinkList[T] {
+func (m *LinkList[T]) OrderedAppend(value T) *LinkList[T] {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	node := &LinkList[T]{
-		node: n,
-		head: m,
+		value: value,
+		head:  m,
 	}
 	m.head.length++
 	//先判断是否小于头节点
-	if Compare(n, m.node, CompareModeLess) {
+	if Compare(value, m.value, CompareModeLess) {
 		node.next = m
 		node.length = m.length
 		node.head = node
@@ -86,7 +86,7 @@ func (m *LinkList[T]) OrderAppend(n T) *LinkList[T] {
 		return node
 	}
 
-	max := m.findMaxNode(n)
+	max := m.findMaxNode(value)
 	if max == nil {
 		m.tail.next = node
 		node.prev = m.tail
@@ -103,12 +103,12 @@ func (m *LinkList[T]) OrderAppend(n T) *LinkList[T] {
 }
 
 // Remove 删除元素
-// params: head 最新的头结点
-// params: deleted 是否删除成功
-func (m *LinkList[T]) Remove(n T) (head *LinkList[T], deleted bool) {
+// head 最新的头结点
+// deleted 是否删除成功
+func (m *LinkList[T]) Remove(value T) (head *LinkList[T], deleted bool) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	node := m.find(n)
+	node := m.find(value)
 	if node == nil {
 		return m.head, false
 	}
@@ -150,37 +150,37 @@ func (m *LinkList[T]) moveHead(head *LinkList[T]) {
 	}
 }
 
-func (m *LinkList[T]) Find(node T) *LinkList[T] {
+func (m *LinkList[T]) Find(value T) *LinkList[T] {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
-	return m.find(node)
+	return m.find(value)
 }
 
-func (m *LinkList[T]) find(node T) *LinkList[T] {
+func (m *LinkList[T]) find(value T) *LinkList[T] {
 	for n := m; n != nil; n = n.next {
-		if Compare(n.node, node, CompareModeEqual) {
+		if Compare(n.value, value, CompareModeEqual) {
 			return n
 		}
 	}
 	return nil
 }
 
-func (m *LinkList[T]) findMaxNode(val T) *LinkList[T] {
+func (m *LinkList[T]) findMaxNode(value T) *LinkList[T] {
 	for n := m; n != nil; n = n.next {
-		if Compare(n.node, val, CompareModeGreater) {
+		if Compare(n.value, value, CompareModeGreater) {
 			return n
 		}
 	}
 	return nil
 }
 
-func (m *LinkList[T]) Walk(call func(list *LinkList[T])) {
+func (m *LinkList[T]) Walk(call func(node *LinkList[T])) {
 	for n := m; n != nil; n = n.next {
 		call(n)
 	}
 }
 
-func (m *LinkList[T]) Back(call func(list *LinkList[T])) {
+func (m *LinkList[T]) Back(call func(node *LinkList[T])) {
 	for n := m; n != nil; n = n.prev {
 		call(n)
 	}
