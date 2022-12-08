@@ -6,12 +6,12 @@
 
 package collection
 
-type BlockingSlice[T Any] struct {
+type BlockingSlice[T any] struct {
 	mu    Mutex
 	slice *Slice[T]
 }
 
-func NewBlockingSlice[T Any](values ...T) *BlockingSlice[T] {
+func NewBlockingSlice[T any](values ...T) *BlockingSlice[T] {
 	b := &BlockingSlice[T]{}
 	b.slice = new(Slice[T])
 	copy(*b.slice, values)

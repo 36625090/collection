@@ -12,7 +12,7 @@ import (
 	"sort"
 )
 
-type Lambda[T Any] struct {
+type Lambda[T any] struct {
 	data Slice[T]
 	cmp  func(i, j T) bool
 }
@@ -29,7 +29,7 @@ func (l *Lambda[T]) Swap(i, j int) {
 	l.data[i], l.data[j] = l.data[j], l.data[i]
 }
 
-func Stream[T Any](in []T) *Lambda[T] {
+func Stream[T any](in []T) *Lambda[T] {
 	return &Lambda[T]{
 		data: in,
 	}

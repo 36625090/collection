@@ -6,9 +6,9 @@
 
 package collection
 
-type Set[T Any] Slice[T]
+type Set[T any] Slice[T]
 
-func NewSet[T Any](values ...T) *Set[T] {
+func NewSet[T any](values ...T) *Set[T] {
 	if values == nil || len(values) == 0 {
 		return &Set[T]{}
 	}

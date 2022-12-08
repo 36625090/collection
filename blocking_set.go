@@ -6,12 +6,12 @@
 
 package collection
 
-type BlockingSet[T Any] struct {
+type BlockingSet[T any] struct {
 	mu  Mutex
 	set Set[T]
 }
 
-func NewBlockingSet[T Any](values ...T) *BlockingSet[T] {
+func NewBlockingSet[T any](values ...T) *BlockingSet[T] {
 	b := &BlockingSet[T]{}
 	b.set = *NewSet[T](values...)
 	return b

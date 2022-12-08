@@ -7,11 +7,12 @@
 package collection
 
 import (
+	"github.com/36625090/collection/common"
 	"log"
 	"sort"
 )
 
-type Slice[T Any] []T
+type Slice[T any] []T
 
 func (m *Slice[T]) Filter(f func(i T) bool) *Slice[T] {
 	var out Slice[T]
@@ -33,7 +34,7 @@ func (m *Slice[T]) Contains(i T) bool {
 	}
 
 	for _, t := range *m {
-		if Compare(i, t, CompareModeEqual) {
+		if common.Compare(i, t, common.CompareModeEqual) {
 			return true
 		}
 	}
@@ -59,7 +60,7 @@ func (m *Slice[T]) IndexOf(val T) int {
 	}
 
 	for i, t := range *m {
-		if Compare(t, val, CompareModeEqual) {
+		if common.Compare(t, val, common.CompareModeEqual) {
 			return i
 		}
 	}
@@ -204,7 +205,7 @@ func (m *Slice[T]) Walk(f func(i T)) {
 	}
 }
 
-type slice[T Any] struct {
+type slice[T any] struct {
 	data *Slice[T]
 	cmp  func(i, j T) bool
 }
@@ -215,7 +216,7 @@ func (s *slice[T]) Len() int {
 
 func (s *slice[T]) Less(i, j int) bool {
 	if s.cmp == nil {
-		return Compare(&(*s.data)[i], &(*s.data)[j], CompareModeLess)
+		return common.Compare(&(*s.data)[i], &(*s.data)[j], common.CompareModeLess)
 	}
 	return s.cmp((*s.data)[i], (*s.data)[j])
 }
