@@ -51,7 +51,7 @@ func TestSlice_Sort(t *testing.T) {
 	//users.Sorted()
 	//t.Log(users)
 	////log.SetFlags(log.LstdFlags | log.Lshortfile)
-	////x2 := Stream(users).Filter(func(i User) bool { return true })
+	////x2 := stream(users).Filter(func(i User) bool { return true })
 	//////.Slice()
 	////x2.Slice().Reverse()
 	////t.Log(x2)
