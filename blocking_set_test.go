@@ -28,6 +28,6 @@ func TestNewBlockingSet_New(t *testing.T) {
 	t.Log(b.IndexOf(3))
 	b.Sorted()
 	t.Log(b.Values())
-	t.Log(b.IndexOf(3))
+	t.Log(b.IndexOf(13))
 
 }

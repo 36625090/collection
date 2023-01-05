@@ -120,7 +120,6 @@ func (m *Slice[T]) Remove(values ...T) int {
 		} else {
 			copy((*m)[idx:], (*m)[idx+1:])
 		}
-		//*m = (*m)[idx:len(*m)]
 		total += 1
 	}
 	*m = (*m)[0 : len(*m)-total]
