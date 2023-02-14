@@ -1,7 +1,7 @@
 package linklist
 
 import (
-	"github.com/36625090/collection/common"
+	"github.com/36625090/lambda/common"
 	"sync"
 )
 
